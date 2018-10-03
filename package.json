@@ -1,0 +1,14 @@
+{
+  "name": "get-pdf",
+  "version": "0.0.0",
+  "description": "Print as pdf the given url",
+  "scripts": {
+    "preinstall": "./install-deps.sh"
+  },
+  "main": "index.js",
+  "author": "cabaalexander",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^1.8.0"
+  }
+}
