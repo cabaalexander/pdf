@@ -1,6 +1,8 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { distPath } = require('./constants.js');
+const mkdirp = require('mkdirp');
+
+const { chapters } = require('../config/constants.js');
 
 const pdf = async ({
   url,
@@ -13,7 +15,7 @@ const pdf = async ({
     return;
   }
 
-  fs.existsSync(distPath) || fs.mkdirSync(distPath);
+  fs.existsSync(chapters) || mkdirp.sync(chapters);
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -23,10 +25,10 @@ const pdf = async ({
 
   const pageTitle = title || await page.title();
   const firstWord = pageTitle.slice(0, pageTitle.indexOf('-') - 1);
-  const pdf_out = output || `${__dirname}/${distPath}/${pdfPrefix}${firstWord}.pdf`;
+  const pdf_out = output || `${chapters}/${pdfPrefix}${firstWord}.pdf`;
 
   await page.evaluate(() => {
-    const footers = document
+    document
       .querySelectorAll('.footdiv')
       .forEach((element) => element.parentNode.removeChild(element));
   });

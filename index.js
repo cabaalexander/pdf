@@ -1,5 +1,5 @@
-const pdf = require('./pdf.js');
-const chaptersUrl = require('./chapters-url.js');
+const pdf = require('./src/pdf.js');
+const chaptersUrl = require('./config/chapters-url.js');
 
 (async () => {
 

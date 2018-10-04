@@ -9,6 +9,8 @@
   "author": "cabaalexander",
   "license": "MIT",
   "dependencies": {
+    "mkdirp": "^0.5.1",
+    "pdf-merge": "^1.1.0",
     "puppeteer": "^1.8.0"
   }
 }
