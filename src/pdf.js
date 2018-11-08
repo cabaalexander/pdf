@@ -2,21 +2,22 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const mkdirp = require('mkdirp');
 
-const { chapters } = require('../config/constants.js');
+const { dist } = require('../config/constants.js');
 
 const pdf = async ({
   url,
   pdfPrefix = '',
   title,
+  group = 'untitled',
   output,
+  eval,
 } = {}) => {
   if (!url) {
     console.log('No url provided');
     return;
   }
 
-  fs.existsSync(chapters) || mkdirp.sync(chapters);
-
+  // Create browser and go to URL
   const browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
@@ -25,18 +26,20 @@ const pdf = async ({
     waitUntil: 'networkidle2'
   });
 
+  const distChapters = `${dist}/${group}`
+
+  fs.existsSync(distChapters) || mkdirp.sync(distChapters);
+
   const pageTitle = title || await page.title();
-  const firstWord = pageTitle.slice(0, pageTitle.indexOf('-') - 1);
-  const pdf_out = output || `${chapters}/${pdfPrefix}${firstWord}.pdf`;
+  const pdf_out = output || `${distChapters}/${pdfPrefix}${pageTitle}.pdf`;
 
-  await page.evaluate(() => {
-    document
-      .querySelectorAll('.footdiv')
-      .forEach((element) => element.parentNode.removeChild(element));
-  });
+  // Evaluate
+  eval && await page.evaluate(eval);
 
+  // Print to PDF
   await page.pdf({path: pdf_out});
 
+  // Info
   console.log(`Created: ${pdf_out}`);
 
   await browser.close();

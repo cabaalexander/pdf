@@ -6,15 +6,24 @@ const chapterSelector = '.summary > li.chapter > a';
 
 (async () => {
 
-  const urls = await getUrls({
+  let urls = await getUrls({
     url: 'https://mostly-adequate.gitbooks.io/mostly-adequate-guide/',
     selector: chapterSelector,
   });
 
-  for (let idx in chaptersUrl) {
+  const [first, second, ...others] = urls;
+
+  urls = [first, second]
+
+  for (let idx in urls) {
     await pdf({
-      url: chaptersUrl[idx],
+      url: urls[idx],
       pdfPrefix: `${+idx + 1}.`,
+      eval: () => {
+        document
+          .querySelectorAll('.footdiv')
+          .forEach((element) => element.parentNode.removeChild(element));
+      }
     })
   }
 
