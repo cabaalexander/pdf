@@ -7,7 +7,7 @@ const { dist } = require('../config/constants.js');
 const pdf = async ({
   url,
   pdfPrefix = '',
-  title,
+  title = x => x,
   group = 'untitled',
   output,
   eval,
@@ -30,7 +30,7 @@ const pdf = async ({
 
   fs.existsSync(distChapters) || mkdirp.sync(distChapters);
 
-  const pageTitle = title || await page.title();
+  const pageTitle = title(await page.title())
   const pdf_out = output || `${distChapters}/${pdfPrefix}${pageTitle}.pdf`;
 
   // Evaluate

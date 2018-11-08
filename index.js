@@ -18,6 +18,7 @@ const chapterSelector = '.summary > li.chapter > a';
   for (let idx in urls) {
     await pdf({
       url: urls[idx],
+      title: s => s.slice(0, s.indexOf('·') - 1),
       pdfPrefix: `${+idx + 1}.`,
       eval: () => {
         document
