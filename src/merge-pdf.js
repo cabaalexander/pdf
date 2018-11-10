@@ -1,17 +1,52 @@
+const path = require('path');
 const fs = require('fs');
 const PDFMerge = require('pdf-merge');
 
-const { learnyouhaskellpdf, chapters } = require('../config/constants.js');
+const collator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: 'base'
+});
 
-const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+const mergePdf = (dir, output) => {
 
-const chaptersFiles = fs
-  .readdirSync(chapters)
-  .sort(collator.compare)
-  .map(file => `${chapters}/${file}`);
+  const chaptersFiles = fs
+    .readdirSync(dir)
+    .sort(collator.compare)
+    .map(file => `${dir}/${file}`)
+    .filter(f => /.pdf$/.test(f));
 
-PDFMerge(chaptersFiles, {output: learnyouhaskellpdf});
+  const distBook = [dir]
+    .map(x => x.replace(/(.*)\/.*$/, "$1"))
+  [0];
 
-// console.log(`Files from (${chapters})\nMerged into (${learnyouhaskellpdf})`);
-console.log(`Files merged\n\n\t${chapters}/*\n\t\tto\n\t${learnyouhaskellpdf}`);
+  const bookName = path.basename(distBook);
+  const outputBook = `${distBook}/${bookName}.pdf`;
+
+  PDFMerge(chaptersFiles, {
+    output: output || outputBook
+  });
+
+  console.log(`Merged: chapters from \`${dir}\` to \`${outputBook}\``);
+
+}
+
+// #########
+// #       #
+// # Begin #
+// #       #
+// #########
+
+const [nodeBin, thisFile, ...dirs] = process.argv;
+
+for (let dir of dirs) {
+  try {
+
+    mergePdf(dir)
+
+  } catch (e) {
+
+    console.error(e);
+
+  }
+}
 

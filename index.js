@@ -1,32 +1,64 @@
+'use strict';
+
+const path = require('path');
+
 const pdf = require('./src/pdf.js');
 const getUrls = require('./src/get-urls.js');
 
-const chapterSelector = '.summary > li.chapter > a';
-
-
-(async () => {
+const main = async ({
+  url,
+  selector,
+  options: {
+    title = x => x,
+    pdfPrefix = x => `${+x + 1}.`,
+    group,
+    __eval = x => x,
+  },
+}) => {
 
   let urls = await getUrls({
-    url: 'https://mostly-adequate.gitbooks.io/mostly-adequate-guide/',
-    selector: chapterSelector,
+    url: url,
+    selector: selector,
   });
 
-  const [first, second, ...others] = urls;
-
-  urls = [first, second]
-
   for (let idx in urls) {
+
     await pdf({
       url: urls[idx],
-      title: s => s.slice(0, s.indexOf('·') - 1),
-      pdfPrefix: `${+idx + 1}.`,
-      eval: () => {
-        document
-          .querySelectorAll('.footdiv')
-          .forEach((element) => element.parentNode.removeChild(element));
-      }
+      title: title,
+      pdfPrefix: pdfPrefix(idx),
+      __eval: __eval,
+      group: group,
     })
+
   }
 
-})()
+}
+
+// #########
+// #       #
+// # Begin #
+// #       #
+// #########
+
+const [nodeBin, thisFile, ...configs] = process.argv;
+
+for (let config of configs) {
+
+  try {
+
+    const requiredConfig = [config]
+      .map(x => path.resolve(x))
+      .map(x => require(x))
+    [0];
+
+    main(requiredConfig);
+
+  } catch (e) {
+
+    console.error(e);
+
+  }
+
+}
 

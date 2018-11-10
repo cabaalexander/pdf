@@ -10,7 +10,7 @@ const pdf = async ({
   title = x => x,
   group = 'untitled',
   output,
-  eval,
+  eval = x => x,
 } = {}) => {
   if (!url) {
     console.log('No url provided');
@@ -26,12 +26,13 @@ const pdf = async ({
     waitUntil: 'networkidle2'
   });
 
-  const distChapters = `${dist}/${group}`
+  const distChapters = `${dist}/${group}/chapters`;
 
   fs.existsSync(distChapters) || mkdirp.sync(distChapters);
 
   const pageTitle = title(await page.title())
-  const pdf_out = output || `${distChapters}/${pdfPrefix}${pageTitle}.pdf`;
+  const pdf_out = output
+    || `${distChapters}/${pdfPrefix}${pageTitle}.pdf`;
 
   // Evaluate
   eval && await page.evaluate(eval);
